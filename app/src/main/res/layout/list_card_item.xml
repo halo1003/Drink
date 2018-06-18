@@ -30,13 +30,24 @@
         android:id="@+id/container_list_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/colorAccent"
         android:animateLayoutChanges="true">
 
-        <ListView
-            android:id="@+id/small_listView"
+        <com.vipulasri.ticketview.TicketView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </ListView>
+            android:layout_height="250dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:id="@+id/ticketView"
+            app:orientation="horizontal"
+            app:scallopRadius="20dp"
+            app:showBorder="false"
+            app:scallopPositionPercent="60"
+            app:showDivider="true"
+            app:dividerType="dash"
+            app:dividerPadding="0dp"
+            app:ticketElevation="14dp" />
     </LinearLayout>
 
 </LinearLayout>

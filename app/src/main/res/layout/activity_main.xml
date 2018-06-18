@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".MainActivity"
     android:layout_centerVertical="true"
     android:orientation="vertical"
@@ -12,46 +13,64 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1">
+
         <com.loopeer.cardstack.CardStackView
             android:id="@+id/stackview_main"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/white"
+            android:background="@color/colorAccent"
             android:clipToPadding="false"
             android:paddingLeft="12dp"
             android:paddingRight="12dp"
             android:paddingTop="12dp"/>
 
+        <io.saeid.fabloading.LoadingView
+            android:id="@+id/loading_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:scaleX="1.5"
+            android:scaleY="1.5"
+            app:mfl_duration="200"
+            app:mfl_onclickLoading="true"
+            app:mfl_repeat="4" />
+
         <RelativeLayout
             android:id="@+id/button_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
             android:layout_gravity="right|center_vertical"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:orientation="horizontal"
-            android:gravity="bottom">
+            android:gravity="bottom"
+            android:orientation="horizontal">
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:textColor="#f8fdf9"
-                android:text="Pre"
-                android:onClick="onPreClick"
                 android:layout_alignParentStart="true"
-                android:layout_margin="10dp"/>
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:layout_margin="10dp"
+                android:background="@color/fbutton_color_midnight_blue"
+                android:onClick="onPreClick"
+                android:paddingHorizontal="30dp"
+                android:text="Pre"
+                android:textColor="#f8fdf9" />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
-                android:textColor="#f8fdf9"
-                android:text="Next"
+                android:layout_margin="10dp"
+                android:background="@color/fbutton_color_midnight_blue"
                 android:onClick="onNextClick"
-                android:layout_alignParentEnd="true"
-                android:layout_margin="10dp"/>
+                android:paddingHorizontal="30dp"
+                android:text="Next"
+                android:textColor="#f8fdf9" />
         </RelativeLayout>
     </RelativeLayout>
 

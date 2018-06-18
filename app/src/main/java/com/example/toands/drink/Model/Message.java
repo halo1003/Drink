@@ -10,17 +10,21 @@ public class Message {
     String title;
     String date;
     String time;
+    String sortTime;
+    String sortDay;
     String shortContain;
     String fullContain;
 
     public Message() {
     }
 
-    public Message(long _id, String title, String date, String time, String shortContain, String fullContain) {
+    public Message(long _id, String title, String date, String time, String sortTime, String sortDay, String shortContain, String fullContain) {
         this._id = _id;
         this.title = title;
         this.date = date;
         this.time = time;
+        this.sortTime = sortTime;
+        this.sortDay = sortDay;
         this.shortContain = shortContain;
         this.fullContain = fullContain;
     }
@@ -57,6 +61,22 @@ public class Message {
         this.time = time;
     }
 
+    public String getSortTime() {
+        return sortTime;
+    }
+
+    public void setSortTime(String sortTime) {
+        this.sortTime = sortTime;
+    }
+
+    public String getSortDay() {
+        return sortDay;
+    }
+
+    public void setSortDay(String sortDay) {
+        this.sortDay = sortDay;
+    }
+
     public String getShortContain() {
         return shortContain;
     }
@@ -78,6 +98,8 @@ public class Message {
         HashMap<String, Object> result = new HashMap<>();
         result.put("_id", _id);
         result.put("date", date);
+        result.put("sortTime",sortTime);
+        result.put("sortDay",sortDay);
         result.put("full-contain", fullContain);
         result.put("short-contain", shortContain);
         result.put("time", time);

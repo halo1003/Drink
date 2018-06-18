@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.PorterDuff;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -87,7 +88,7 @@ public class AppStackAdapter extends StackAdapter<Integer> {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     Message message = dataSnapshot.getValue(Message.class);
-                    mTextTitle.setText(message.getDate());
+                    mTextTitle.setText(message.getSortDay()+" ["+message.getSortTime()+"]");
                 }
 
                 @Override
@@ -96,7 +97,6 @@ public class AppStackAdapter extends StackAdapter<Integer> {
                 }
             });
         }
-
     }
 
     static class ColorItemWithNoHeaderViewHolder extends CardStackView.ViewHolder {
