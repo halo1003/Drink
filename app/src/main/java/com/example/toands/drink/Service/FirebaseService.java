@@ -84,6 +84,8 @@ public class FirebaseService extends Service {
                 com.example.toands.drink.Model.Message message = new com.example.toands.drink.Model.Message();
                 message.set_id(containValue.id);
                 message.setTitle(containValue.TITLE_MESS);
+                message.setSortDay(functions.getDayOnly());
+                message.setSortTime(functions.getTimeOnly());
                 message.setDate(functions.getDate());
                 message.setTime(functions.getTime());
                 message.setShortContain(containValue.SHORT_DE);

@@ -2,11 +2,13 @@ package com.example.toands.drink;
 
 import android.app.ActionBar;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,8 +16,11 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.example.toands.drink.Adapter.AppStackAdapter;
+import com.example.toands.drink.Database.SQLiteDB;
+import com.example.toands.drink.Model.MainNode;
 import com.example.toands.drink.Service.ConstantService;
 import com.example.toands.drink.Service.FirebaseService;
 import com.google.firebase.database.DataSnapshot;
@@ -30,6 +35,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import io.saeid.fabloading.LoadingView;
+
+import static com.example.toands.drink.Database.SQLiteDB.TBname;
+
 public class MainActivity extends AppCompatActivity implements CardStackView.ItemExpendListener{
 
     ContainValue containValue = new ContainValue();
@@ -43,7 +52,10 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
     private String tagMain = "btnMain";
     private String pluse = "+";
 
+    LoadingView mLoadingView;
     List<Integer> list_date = new ArrayList<Integer>();
+
+    public static Integer[] Initial = new Integer[]{};
 
     public static Integer[] TEST_DATAS = new Integer[]{
             R.color.color_1,
@@ -83,6 +95,82 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
 
         _DefaultCaller();
 
+        final SQLiteDB sqLiteDB = new SQLiteDB(getApplicationContext());
+        sqLiteDB.Create_table();
+
+        mLoadingView = (LoadingView) findViewById(R.id.loading_view);
+        int marvel_1 = R.drawable.marvel_1;
+        int marvel_2 = R.drawable.marvel_2;
+        int marvel_3 = R.drawable.marvel_3;
+        int marvel_4 = R.drawable.marvel_4;
+
+        mLoadingView.addAnimation(Color.parseColor("#FFD200"), marvel_1, LoadingView.FROM_LEFT);
+        mLoadingView.addAnimation(Color.parseColor("#2F5DA9"), marvel_2, LoadingView.FROM_TOP);
+        mLoadingView.addAnimation(Color.parseColor("#FF4218"), marvel_3, LoadingView.FROM_RIGHT);
+        mLoadingView.addAnimation(Color.parseColor("#C7E7FB"), marvel_4, LoadingView.FROM_BOTTOM);
+
+        mLoadingView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mLoadingView.setDuration(200);
+                mLoadingView.setRepeat(10);
+                mLoadingView.startAnimation();
+
+                LoadData();
+
+                new Handler().postDelayed(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                functions.loge("MainActivity","fresh: success");
+                                mStackAdapter.updateData(list_date);
+                            }
+                        }
+                        , 3000
+                );
+
+                mStackView.setItemExpendListener(MainActivity.this);
+                mStackAdapter = new AppStackAdapter(getApplicationContext());
+                mStackView.setAdapter(mStackAdapter);
+            }
+        });
+
+        mLoadingView.performClick();
+
+        btnMain.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                final Intent i = new Intent(MainActivity.this, FirebaseService.class);
+//                startService(i);
+//
+//                Intent i_constantService = new Intent(MainActivity.this, ConstantService.class);
+//                startService(i_constantService);
+
+                if (sqLiteDB.getNodesCount(TBname)==0 || (Integer.parseInt(sqLiteDB.getNew(TBname).getDay())<Integer.parseInt(functions.getDay()))){
+
+                    MainNode mainNode = new MainNode();
+
+                    mainNode.setHour(functions.getHour());
+                    mainNode.setMinute(functions.getMinute());
+                    mainNode.setSecond(functions.getSecond());
+                    mainNode.setTime_type(functions.getType());
+                    mainNode.setDay(functions.getDay());
+                    mainNode.setMounth(functions.getMouth());
+                    mainNode.setYear(functions.getYear());
+
+                    sqLiteDB.addNode(mainNode);
+
+                    Toast.makeText(getApplicationContext(),"Push Success",Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(getApplicationContext(),"Today/"+sqLiteDB.getNew(TBname).getDay()+" clicked! Waiting, next day",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    public void LoadData(){
+
+        list_date = new ArrayList<Integer>();
         containValue._Messages.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -91,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
                 for (int i = 0 ; i < n ; i++){
                     list_date.add(TEST_DATAS[i]);
                 }
-                functions.loge("MainActivity","Data-load: success");
+                functions.loge("MainActivity","Data-load: success "+n);
             }
 
             @Override
@@ -99,32 +187,6 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
 
             }
         });
-
-        btnMain.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final Intent i = new Intent(MainActivity.this, FirebaseService.class);
-                startService(i);
-
-                Intent i_constantService = new Intent(MainActivity.this, ConstantService.class);
-                startService(i_constantService);
-            }
-        });
-
-        mStackView.setItemExpendListener(this);
-        mStackAdapter = new AppStackAdapter(this);
-        mStackView.setAdapter(mStackAdapter);
-
-        new Handler().postDelayed(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        functions.loge("MainActivity","fresh: success");
-                        mStackAdapter.updateData(list_date);
-                    }
-                }
-                , 3000
-        );
     }
 
     public void _DefaultCaller() {
@@ -166,5 +228,22 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
     @Override
     public void onItemExpend(boolean expend) {
         mActionButtonContainer.setVisibility(expend ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mLoadingView.resumeAnimation();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mLoadingView.pauseAnimation();
     }
 }
