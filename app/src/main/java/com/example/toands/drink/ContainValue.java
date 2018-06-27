@@ -18,8 +18,14 @@ public class ContainValue {
     public String TITLE_MESS = "The Report";
 
     // #Firebase configuration value
-    public String DATE = "date";
-    public String TIME = "time";
+    public String DAY = "DAY";
+    public String MONTH = "MONTH";
+    public String YEAR = "YEAR";
+    public String HOUR = "HOUR";
+    public String MINUTE = "MINUTE";
+    public String SECOND = "SECOND";
+    public String TIMETYPE = "TIMETYPE";
+
     public String CONSTANT_BLISTER = "constant-blister";
     public String CURRENT_DRUG = "current-drugs";
     public String THE_NUMBER_BLISTER = "the-number-blister";

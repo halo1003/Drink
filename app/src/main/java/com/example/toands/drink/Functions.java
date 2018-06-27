@@ -14,6 +14,12 @@ public class Functions {
         return time;
     }
 
+    public String getTimeZ(){
+        DateFormat df = new SimpleDateFormat("zzzz");
+        String time = df.format(Calendar.getInstance().getTime());
+        return time;
+    }
+
     public String getHour(){
         DateFormat df = new SimpleDateFormat("hh");
         String time = df.format(Calendar.getInstance().getTime());

@@ -14,27 +14,22 @@
         android:layout_height="wrap_content"
         android:layout_weight="1">
 
-        <com.loopeer.cardstack.CardStackView
-            android:id="@+id/stackview_main"
+        <com.yalantis.phoenix.PullToRefreshView
+            android:id="@+id/pull_to_refresh"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/colorAccent"
-            android:clipToPadding="false"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
-            android:paddingTop="12dp"/>
+            android:layout_height="match_parent">
 
-        <io.saeid.fabloading.LoadingView
-            android:id="@+id/loading_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:scaleX="1.5"
-            android:scaleY="1.5"
-            app:mfl_duration="200"
-            app:mfl_onclickLoading="true"
-            app:mfl_repeat="4" />
+            <com.loopeer.cardstack.CardStackView
+                android:id="@+id/stackview_main"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/fbutton_color_wet_asphalt"
+                android:clipToPadding="false"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
+                android:paddingTop="12dp"/>
+
+        </com.yalantis.phoenix.PullToRefreshView>
 
         <RelativeLayout
             android:id="@+id/button_container"
@@ -43,8 +38,7 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_gravity="right|center_vertical"
-            android:gravity="bottom"
-            android:orientation="horizontal">
+            android:gravity="bottom">
 
             <Button
                 android:layout_width="wrap_content"

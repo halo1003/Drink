@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.example.toands.drink.ContainValue;
 import com.example.toands.drink.Functions;
@@ -58,9 +59,6 @@ public class FirebaseService extends Service {
 
                     containValue._DrugAbuse.setValue(drugAbuse1);
                 }
-
-
-
             }
 
             @Override
@@ -72,8 +70,7 @@ public class FirebaseService extends Service {
     }
 
     @Override
-    public void onCreate() {
-        super.onCreate();
+    public int onStartCommand(final Intent intent, int flags, int startId) {
 
         containValue._Messages.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -82,19 +79,31 @@ public class FirebaseService extends Service {
                 functions.logi(containValue.FIREBASE_TAG+TAG,containValue.id+"");
 
                 com.example.toands.drink.Model.Message message = new com.example.toands.drink.Model.Message();
+                containValue.id = intent.getLongExtra("ID",containValue.id);
+
+                if (!intent.getStringExtra(containValue.DAY).isEmpty()){
+
+                    message.setSortDay(intent.getStringExtra(containValue.MONTH));
+                    message.setDate(intent.getStringExtra(containValue.DAY));
+
+                    message.setSortTime(intent.getStringExtra(containValue.MINUTE));
+                    message.setTime(intent.getStringExtra(containValue.HOUR)+functions.getTimeZ());
+                }else {
+
+                    message.setSortDay(functions.getDayOnly());
+                    message.setDate(functions.getDate());
+
+                    message.setSortTime(functions.getTimeOnly());
+                    message.setTime(functions.getTime());
+                }
                 message.set_id(containValue.id);
                 message.setTitle(containValue.TITLE_MESS);
-                message.setSortDay(functions.getDayOnly());
-                message.setSortTime(functions.getTimeOnly());
-                message.setDate(functions.getDate());
-                message.setTime(functions.getTime());
                 message.setShortContain(containValue.SHORT_DE);
                 message.setFullContain(containValue.FULL_DE);
 
+                Log.e(TAG,containValue.id+"");
                 containValue._Messages.child(String.valueOf(containValue.id)).setValue(message);
-
                 drug_abuse();
-
                 stopSelf();
             }
 
@@ -103,6 +112,14 @@ public class FirebaseService extends Service {
 
             }
         });
+
+        stopSelf();
+        return START_NOT_STICKY;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
     }
 
     @Override

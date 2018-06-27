@@ -2,13 +2,13 @@ package com.example.toands.drink.Model;
 
 public class MainNode {
     int id;
-    String hour;
-    String minute;
-    String second;
-    String time_type;
-    String day;
-    String mounth;
-    String year;
+    public String hour;
+    public String minute;
+    public String second;
+    public String time_type;
+    public String day;
+    public String mounth;
+    public String year;
 
     public MainNode() {
     }
