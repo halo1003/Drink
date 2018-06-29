@@ -18,13 +18,13 @@ public class FirebaseService extends Service {
 
     ContainValue containValue = new ContainValue();
     Functions functions = new Functions();
-    private String TAG = ".FirebaseService";
+    private static final String TAG = "FirebaseService";
     private int bilster;
 
     @Override
     public void onStart(Intent intent, int startId) {
         super.onStart(intent, startId);
-        functions.logi(containValue.FIREBASE_TAG+TAG,"Start");
+        functions.logi(TAG,"Start");
     }
 
     private void drug_abuse(){
@@ -71,7 +71,7 @@ public class FirebaseService extends Service {
 
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
-
+        Log.e(TAG,"onStartCommand");
         containValue._Messages.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -125,7 +125,7 @@ public class FirebaseService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        functions.logi(containValue.FIREBASE_TAG+TAG,"Stop");
+        functions.logi(TAG,"Stop");
     }
 
     public FirebaseService() {

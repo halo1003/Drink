@@ -1,11 +1,15 @@
 package com.example.toands.drink;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +30,7 @@ import com.github.javiersantos.materialstyleddialogs.enums.Style;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.jeevandeshmukh.glidetoastlib.GlideToast;
 import com.loopeer.cardstack.AllMoveDownAnimatorAdapter;
 import com.loopeer.cardstack.CardStackView;
 import com.loopeer.cardstack.UpDownAnimatorAdapter;
@@ -34,6 +39,8 @@ import com.yalantis.phoenix.PullToRefreshView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import mehdi.sakout.fancybuttons.FancyButton;
 
 import static com.example.toands.drink.Database.SQLiteDB.TBname;
 
@@ -45,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
     Functions functions = new Functions();
 
     Button btnMain;
+    FancyButton fancyButton;
     PullToRefreshView mPullToRefreshView;
 
     private CardStackView mStackView;
@@ -95,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
         Window window = MainActivity.this.getWindow();
         window.setStatusBarColor(ContextCompat.getColor(MainActivity.this,R.color.fbutton_color_midnight_blue));
 
-        final Intent i_auto = new Intent(MainActivity.this,AutoPush.class);
+        Intent i_auto = new Intent(MainActivity.this,AutoPush.class);
         startService(i_auto);
 
         _DefaultCaller();
@@ -116,13 +124,15 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
                     @Override
                     public void run() {
                         mPullToRefreshView.setRefreshing(false);
+                        Intent i_auto = new Intent(MainActivity.this,AutoPush.class);
                         startService(i_auto);
+                        Log.e(TAG,"refreshing...");
                     }
                 }, 1000);
             }
         });
 
-        btnMain.setOnClickListener(new View.OnClickListener() {
+        fancyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 //                final Intent i = new Intent(MainActivity.this, FirebaseService.class);
@@ -145,20 +155,41 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
 
                     sqLiteDB.addNode(mainNode);
 
-                    Toast.makeText(getApplicationContext(),"Push Success",Toast.LENGTH_SHORT).show();
+                    new GlideToast.makeToast(MainActivity.this,"Push success"
+                            ,GlideToast.LENGTHTOOLONG,GlideToast.SUCCESSTOAST,GlideToast.BOTTOM).show();
                 }else {
-                    String daymonthstr = sqLiteDB.getNew(TBname).getHour()+":"+sqLiteDB.getNew(TBname).getMinute()+" "
+                    String temp = sqLiteDB.getNew(TBname).getHour()+":"+sqLiteDB.getNew(TBname).getMinute()+" "
                             +sqLiteDB.getNew(TBname).getTime_type();
-                    Popup_Warning(MainActivity.this,daymonthstr);
+                    String hour = functions.getHour();
+                    String minute = functions.getMinute();
+                    String second = functions.getSecond();
+                    String type = functions.getType();
+                    Popup_Warning(MainActivity.this,temp,hour,minute,second,type);
                 }
             }
         });
     }
 
-    public void Popup_Warning(Context context,String s){
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String message = intent.getStringExtra(containValue.SIGNAL);
+            if (!message.isEmpty()){
+                if (message.equals("rewrite")) {
+                    new GlideToast.makeToast(MainActivity.this, "Update success"
+                            , GlideToast.LENGTHTOOLONG, GlideToast.WARNINGTOAST, GlideToast.BOTTOM).show();
+                }else{
+                    new GlideToast.makeToast(MainActivity.this, "Server synchronous"
+                            , GlideToast.LENGTHTOOLONG, GlideToast.WARNINGTOAST, GlideToast.BOTTOM).show();
+                }
+            }
+        }
+    };
+
+    public void Popup_Warning(Context context, String temp, final String h, final String m, final String s, final String type){
         new MaterialStyledDialog.Builder(context)
                 .setTitle("Exist Detected!!!")
-                .setDescription("You already touched at "+s+"\nDo you want to overwrite this?")
+                .setDescription("You already touched at "+temp+"\nDo you want to overwrite this?")
                 .setHeaderColor(R.color.fbutton_color_pomegranate)
                 .setStyle(Style.HEADER_WITH_TITLE)
                 .setPositiveText("Yes")
@@ -166,7 +197,10 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        Toast.makeText(getApplicationContext(),"Call back test",Toast.LENGTH_SHORT).show();
+                        SQLiteDB sqLiteDB = new SQLiteDB(getApplicationContext());
+                        sqLiteDB.UpdateTB(TBname,h,m,s,type);
+                        new GlideToast.makeToast(MainActivity.this, "Update success"
+                                , GlideToast.LENGTHTOOLONG, GlideToast.SUCCESSTOAST, GlideToast.BOTTOM).show();
                     }
                 })
                 .show();
@@ -197,7 +231,8 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
     }
 
     public void _DefaultCaller() {
-        btnMain = (Button) findViewById(R.id.btnMain);
+//        btnMain = (Button) findViewById(R.id.btnMain);
+        fancyButton = (FancyButton) findViewById(R.id.btnMain);
         mStackView = (CardStackView) findViewById(R.id.stackview_main);
         mActionButtonContainer = (RelativeLayout) findViewById(R.id.button_container);
         mPullToRefreshView = (PullToRefreshView) findViewById(R.id.pull_to_refresh);
@@ -246,10 +281,13 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
     @Override
     protected void onResume() {
         super.onResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                new IntentFilter(containValue.SIGNAL));
     }
 
     @Override
     protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
         super.onPause();
     }
 }

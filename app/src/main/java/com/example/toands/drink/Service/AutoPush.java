@@ -1,26 +1,35 @@
 package com.example.toands.drink.Service;
 
+import android.app.Activity;
 import android.app.Service;
 import android.content.Intent;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.example.toands.drink.ContainValue;
 import com.example.toands.drink.Database.SQLiteDB;
 import com.example.toands.drink.Functions;
+import com.example.toands.drink.MainActivity;
+import com.example.toands.drink.Model.Day;
 import com.example.toands.drink.Model.MainNode;
+import com.example.toands.drink.Model.Message;
+import com.example.toands.drink.Model.Time;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.jeevandeshmukh.glidetoastlib.GlideToast;
 
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.StringTokenizer;
 
 import static com.example.toands.drink.Database.SQLiteDB.TBname;
 
@@ -107,6 +116,43 @@ public class AutoPush extends Service {
         return null;
     }
 
+    public Time getHourReturn(String str){
+
+        StringTokenizer tokens = new StringTokenizer(str, ",");
+        String time_temp = tokens.nextToken();
+
+        tokens = new StringTokenizer(time_temp, ":");
+        String h = tokens.nextToken();
+        String m = tokens.nextToken();
+        String s_temp = tokens.nextToken();
+
+        tokens = new StringTokenizer(s_temp," ");
+        String s = tokens.nextToken();
+        String type = tokens.nextToken();
+
+        Time time = new Time();
+        time.setHour(h);
+        time.setMinute(m);
+        time.setSecond(s);
+        time.setType(type);
+
+        return time;
+    }
+
+    public Day getDayReturn(String str){
+
+        StringTokenizer tokenizer = new StringTokenizer(str,",");
+        String d = tokenizer.nextToken();
+        String temp = tokenizer.nextToken();
+
+        tokenizer = new StringTokenizer(temp," ");
+        tokenizer.nextToken();
+        String m = tokenizer.nextToken();
+        String y = tokenizer.nextToken();
+        Log.e(TAG,d+"-"+m+"-"+y);
+        return new Day(d,m,y);
+    }
+
     @Override
     public void onStart(Intent intent, int startId) {
         super.onStart(intent, startId);
@@ -122,6 +168,7 @@ public class AutoPush extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        makeAlert();
         final SQLiteDB sqLiteDB = new SQLiteDB(getApplicationContext());
         realcount = sqLiteDB.getNodesCount(TBname);
         containValue._Messages.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -129,12 +176,10 @@ public class AutoPush extends Service {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 vitualcount = dataSnapshot.getChildrenCount();
                 if (realcount-vitualcount>=0){
-                    Toast.makeText(getApplicationContext(),"Server Synchronous",Toast.LENGTH_SHORT).show();
-                    while (vitualcount<=realcount){
-                        vitualcount++;
-                        if (vitualcount>realcount) break;
+                    //Toast.makeText(getApplicationContext(),"Server Synchronous",Toast.LENGTH_SHORT).show();
+                    //new GlideToast.makeToast((,"Server Synchronous",GlideToast.LENGTHLONG,GlideToast.SUCCESSTOAST,GlideToast.TOP).show();
 
-                            Log.e(TAG,vitualcount+"/"+realcount);
+                    while (vitualcount<=realcount){
 
                         MainNode mainNode = sqLiteDB.getNode((int) vitualcount);
 
@@ -150,6 +195,7 @@ public class AutoPush extends Service {
 
                         mIntent.putExtra("ID", vitualcount -1);
 
+                        Log.e(TAG,fullday);
                         mIntent.putExtra(containValue.HOUR,fullhour);
                         mIntent.putExtra(containValue.MINUTE,shorthour);
 
@@ -157,6 +203,26 @@ public class AutoPush extends Service {
                         mIntent.putExtra(containValue.MONTH,shortday);
 
                         startService(mIntent);
+
+                        vitualcount++;
+                    }
+                }else{
+                    for (DataSnapshot data: dataSnapshot.getChildren()){
+                        Message node = data.getValue(Message.class);
+
+                        Time time = getHourReturn(node.getTime());
+                        Day day = getDayReturn(node.getSortDay());
+
+                        MainNode mainNode = new MainNode();
+                        mainNode.setHour(time.getHour());
+                        mainNode.setMinute(time.getMinute());
+                        mainNode.setSecond(time.getSecond());
+                        mainNode.setTime_type(time.getType());
+                        mainNode.setDay(day.getDay());
+                        mainNode.setMounth(day.getMounth());
+                        mainNode.setYear(day.getYear());
+
+                        sqLiteDB.addNode(mainNode);
                     }
                 }
             }
@@ -168,5 +234,12 @@ public class AutoPush extends Service {
         });
 
         stopSelf();
+    }
+
+    private void makeAlert() {
+        Intent intent = new Intent(containValue.SIGNAL);
+        // add data
+        intent.putExtra(containValue.SIGNAL, "on");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 }

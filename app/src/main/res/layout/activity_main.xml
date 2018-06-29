@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fancy="http://schemas.android.com/apk/res-auto"
     tools:context=".MainActivity"
     android:layout_centerVertical="true"
     android:orientation="vertical"
@@ -12,7 +12,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1">
+        android:layout_weight="1.1">
 
         <com.yalantis.phoenix.PullToRefreshView
             android:id="@+id/pull_to_refresh"
@@ -80,19 +80,39 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/fbutton_color_midnight_blue"
-        android:gravity="center"
-        android:layout_weight="6">
+        android:gravity="top"
+        android:layout_weight="5.9">
 
 
-        <Button
+        <!--<Button-->
+            <!--android:id="@+id/btnMain"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:padding="10dp"-->
+            <!--android:layout_marginTop="12dp"-->
+            <!--android:text="Push"-->
+            <!--android:layout_marginHorizontal="50dp"-->
+            <!--android:background="@drawable/shape_button"-->
+            <!--android:drawableStart="@android:drawable/ic_popup_reminder" />-->
+        <mehdi.sakout.fancybuttons.FancyButton
             android:id="@+id/btnMain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:text="Push"
+            android:layout_marginTop="12dp"
             android:layout_marginHorizontal="50dp"
-            android:background="@drawable/shape_button"
-            android:drawableStart="@android:drawable/ic_popup_reminder" />
+            android:paddingBottom="10dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="10dp"
+            fancy:fb_borderColor="#FFFFFF"
+            fancy:fb_borderWidth="1dp"
+            fancy:fb_defaultColor="@color/fbutton_color_alizarin"
+            fancy:fb_focusColor="#ffc800"
+            fancy:fb_iconPosition="left"
+            fancy:fb_radius="30dp"
+            fancy:fb_text="Push"
+            fancy:fb_textColor="#FFFFFF" />
+
         <TextView
             android:layout_below="@+id/btnMain"
             android:gravity="center"

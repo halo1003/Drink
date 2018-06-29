@@ -7,7 +7,7 @@ public class ContainValue {
 
     public String _cmd = "+/n-----------------------------------------/n+";
 
-    public String TAG = "main";
+    public String SIGNAL = "SIGN_VALUE";
     public String ERROR = "error";
     public String TEXT_VIEW = "txtv";
     public String BUTTON = "btn";

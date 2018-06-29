@@ -72,7 +72,8 @@ public class SQLiteDB extends SQLiteOpenHelper{
         values.put(colYear,mainNode.getYear());
 
         db.insert(TBname,null,values);
-        Log.e(TAG,"Insert success");
+        Log.e(TAG,"Insert success: ["+mainNode.getHour()+":"+mainNode.getMinute()+"] "
+                +mainNode.getDay()+"/"+mainNode.getMounth()+"/"+mainNode.getYear());
         db.close();
     }
 
@@ -97,6 +98,19 @@ public class SQLiteDB extends SQLiteOpenHelper{
         cursor.close();
         db.close();
         return null;
+    }
+
+    public void UpdateTB(String TBname,String hour,String minute,String second,String type){
+        String sql = "UPDATE "+TBname
+                +" SET "+colHour+" = '"+hour+"', "
+                +colMinute+" = '"+minute+"', "
+                +colSecond+" = '"+second+"', "
+                +colTimeType+" = '"+type+"' "
+                +" WHERE id = ";
+        String sql2 = "(SELECT id FROM "+TBname+" ORDER BY ID DESC LIMIT 1)";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL(sql+sql2);
     }
 
     public MainNode getNew(String TBname) {
