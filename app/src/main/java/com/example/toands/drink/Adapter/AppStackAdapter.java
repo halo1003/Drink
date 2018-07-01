@@ -20,6 +20,8 @@ import com.loopeer.cardstack.StackAdapter;
 
 public class AppStackAdapter extends StackAdapter<Integer> {
 
+    private static final String TAG = "AppStackAdapter";
+
     public AppStackAdapter(Context context) {
         super(context);
     }
@@ -32,7 +34,6 @@ public class AppStackAdapter extends StackAdapter<Integer> {
         }
         if (holder instanceof ColorItemWithNoHeaderViewHolder) {
             ColorItemWithNoHeaderViewHolder h = (ColorItemWithNoHeaderViewHolder) holder;
-            h.onBind(data, position);
         }
         if (holder instanceof ColorItemViewHolder) {
             ColorItemViewHolder h = (ColorItemViewHolder) holder;

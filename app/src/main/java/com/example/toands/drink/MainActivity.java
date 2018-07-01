@@ -4,17 +4,23 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -23,25 +29,35 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.toands.drink.Adapter.AppStackAdapter;
 import com.example.toands.drink.Database.SQLiteDB;
 import com.example.toands.drink.Model.MainNode;
+import com.example.toands.drink.Model.Version;
 import com.example.toands.drink.Service.AutoPush;
 
 import com.github.javiersantos.materialstyleddialogs.MaterialStyledDialog;
 import com.github.javiersantos.materialstyleddialogs.enums.Style;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.jeevandeshmukh.glidetoastlib.GlideToast;
 import com.loopeer.cardstack.AllMoveDownAnimatorAdapter;
 import com.loopeer.cardstack.CardStackView;
 import com.loopeer.cardstack.UpDownAnimatorAdapter;
 import com.loopeer.cardstack.UpDownStackAnimatorAdapter;
+import com.pedro.library.AutoPermissions;
+import com.qhutch.bottomsheetlayout.BottomSheetLayout;
 import com.yalantis.phoenix.PullToRefreshView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import mehdi.sakout.fancybuttons.FancyButton;
 
+import static com.example.toands.drink.Database.SQLiteDB.TB_version_name;
 import static com.example.toands.drink.Database.SQLiteDB.TBname;
 
 public class MainActivity extends AppCompatActivity implements CardStackView.ItemExpendListener{
@@ -51,13 +67,17 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
     ContainValue containValue = new ContainValue();
     Functions functions = new Functions();
 
-    Button btnMain;
-    FancyButton fancyButton;
+    FancyButton fancyButton,fbtnGraph,fbtnDownload;
     PullToRefreshView mPullToRefreshView;
 
     private CardStackView mStackView;
     private RelativeLayout mActionButtonContainer;
     private AppStackAdapter mStackAdapter;
+    private RelativeLayout relativeLayout;
+    private BottomSheetLayout bottomSheetLayout;
+    private ImageView imageView;
+
+    private int control = -1;
 
     private String tagMain = "btnMain";
     private String pluse = "+";
@@ -108,8 +128,13 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
 
         _DefaultCaller();
 
+        AutoPermissions.Companion.loadAllPermissions(MainActivity.this, 1);
+
+        relativeLayout.setVisibility(View.GONE);
         final SQLiteDB sqLiteDB = new SQLiteDB(getApplicationContext());
+
         sqLiteDB.Create_table();
+        sqLiteDB.Create_table_ver();
 
         mStackView.setItemExpendListener(MainActivity.this);
         mStackAdapter = new AppStackAdapter(getApplicationContext());
@@ -168,6 +193,78 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
                 }
             }
         });
+
+        fbtnDownload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+//                String url = "https://github.com/Piashsarker/AndroidAppUpdateLibrary/raw/master/app-debug.apk";
+
+                containValue._Version.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        double ver = (double) dataSnapshot.child("ver").getValue();
+                        String link = dataSnapshot.child("link").getValue().toString();
+                        Version version = new Version(ver,functions.getDayOnly());
+
+                        if (sqLiteDB.getNodesCount(TB_version_name)>0){
+                            Log.e(TAG,sqLiteDB.getNewVersion().getVer()+"/"+ver);
+                            if (sqLiteDB.getNewVersion().getVer()<ver){
+                                sqLiteDB.addNodeVersion(version);
+                                Download(link);
+                            }else{
+                                Popup_NoExist(MainActivity.this,ver,sqLiteDB.getNewVersion().getDay());
+                            }
+                        }else{
+                            sqLiteDB.addNodeVersion(version);
+                            Download(link);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+        });
+
+        fbtnGraph.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this,"g",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                control = control * -1;
+                imageView.animate().rotationBy(180*control).setDuration(500).setInterpolator(new LinearInterpolator()).start();
+                bottomSheetLayout.toggle();
+                //imageView.setEnabled(false);
+            }
+        });
+
+        bottomSheetLayout.setOnProgressListener(new BottomSheetLayout.OnProgressListener() {
+            @Override
+            public void onProgress(float v) {
+                if (bottomSheetLayout.isExpended()){
+
+                }else{
+
+                }
+            }
+        });
+    }
+
+    private void Download(String link){
+        if (link.startsWith("https://")) {
+            DownloadApk downloadApk = new DownloadApk(MainActivity.this);
+            downloadApk.startDownloadingApk(link);
+        }else {
+            new GlideToast.makeToast(MainActivity.this, "Wrong URL"
+                    , GlideToast.LENGTHTOOLONG, GlideToast.FAILTOAST, GlideToast.BOTTOM).show();
+        }
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
@@ -206,6 +303,16 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
                 .show();
     }
 
+    public void Popup_NoExist(Context context, double ver,String day){
+        new MaterialStyledDialog.Builder(context)
+                .setTitle("Your version is newest!!")
+                .setDescription("Your version is "+ver+"\nLast released in "+day)
+                .setHeaderColor(R.color.fbutton_color_pomegranate)
+                .setStyle(Style.HEADER_WITH_TITLE)
+                .setPositiveText("Okay")
+                .show();
+    }
+
     public void LoadData(){
 
         containValue._Messages.addValueEventListener(new ValueEventListener() {
@@ -231,11 +338,19 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
     }
 
     public void _DefaultCaller() {
-//        btnMain = (Button) findViewById(R.id.btnMain);
+
         fancyButton = (FancyButton) findViewById(R.id.btnMain);
-        mStackView = (CardStackView) findViewById(R.id.stackview_main);
+        fbtnGraph = (FancyButton)findViewById(R.id.btnGraph);
+        fbtnDownload = (FancyButton) findViewById(R.id.btnDownload);
+
         mActionButtonContainer = (RelativeLayout) findViewById(R.id.button_container);
+
+        relativeLayout = (RelativeLayout) findViewById(R.id.button_container);
+        mStackView = (CardStackView) findViewById(R.id.stackview_main);
         mPullToRefreshView = (PullToRefreshView) findViewById(R.id.pull_to_refresh);
+        bottomSheetLayout = (BottomSheetLayout) findViewById(R.id.bottom_sheet_layout);
+
+        imageView = (ImageView) findViewById(R.id.imageViewArrow);
     }
 
     @Override

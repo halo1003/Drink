@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.example.toands.drink.Model.MainNode;
+import com.example.toands.drink.Model.Version;
 
 public class SQLiteDB extends SQLiteOpenHelper{
 
@@ -21,6 +22,9 @@ public class SQLiteDB extends SQLiteOpenHelper{
     public static String colMonth = "month";
     public static String colYear = "year";
 
+    public static String TB_version_name = "Table_version";
+    public static String colVer = "version";
+
     MainNode mainNode;
     String TAG = "SQLiteDB";
 
@@ -31,6 +35,30 @@ public class SQLiteDB extends SQLiteOpenHelper{
     public SQLiteDB(Context context, MainNode mainNode) {
         super(context, DBname, null, 1);
         this.mainNode = mainNode;
+    }
+
+    public void Create_table_ver(){
+        String SQL = "CREATE TABLE IF NOT EXISTS "+ TB_version_name+"("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                +colVer+" DOUBLE,"
+                +colDay+" STRING"
+                +")";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL(SQL);
+        Log.e(TAG,"Create table version success");
+    }
+
+    public void addNodeVersion(Version version){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(colVer, version.getVer());
+        values.put(colDay, version.getDay());
+
+        db.insert(TB_version_name,null,values);
+        Log.e(TAG,"Insert success: ["+version.getVer()+"]");
+        db.close();
     }
 
     public void Create_table(){
@@ -111,6 +139,26 @@ public class SQLiteDB extends SQLiteOpenHelper{
 
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL(sql+sql2);
+    }
+
+    public Version getNewVersion(){
+        String sql = "SELECT * FROM "+TB_version_name+" ORDER BY ID DESC LIMIT 1";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(sql, null);
+
+        if (cursor.moveToFirst()){
+            do{
+                Version version = new Version();
+                version.setVer(cursor.getDouble(1));
+                version.setDay(cursor.getString(2));
+                return version;
+            }while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return null;
     }
 
     public MainNode getNew(String TBname) {

@@ -21,17 +21,21 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     //noinspection GradleCompatible
-
+    implementation 'com.qhutch.bottomsheetlayout:bottomsheetlayout:0.1.6'
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.loopeer.library:cardstack:1.0.2'
     implementation 'com.vipulasri:ticketview:1.0.5'
     implementation 'com.yalantis:phoenix:1.2.3'
     implementation 'com.github.medyo:fancybuttons:1.8.4'
+    implementation 'com.github.pedroSG94:AutoPermissions:1.0.3'
     implementation 'com.github.imjeevandeshmukh:GlideToast:1.0'
     implementation 'com.github.javiersantos:MaterialStyledDialogs:2.1'
-    implementation 'com.google.firebase:firebase-core:16.0.0'
+    implementation 'com.google.firebase:firebase-core:16.0.1'
+    implementation 'com.google.firebase:firebase-storage:16.0.1'
     implementation 'com.google.firebase:firebase-database:16.0.1'
+    implementation 'com.google.firebase:firebase-auth:16.0.2'
+    implementation 'com.firebase:firebase-client-android:2.4.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
