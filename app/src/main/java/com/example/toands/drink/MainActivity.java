@@ -140,6 +140,8 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
         mStackAdapter = new AppStackAdapter(getApplicationContext());
         mStackView.setAdapter(mStackAdapter);
 
+        Log.e(TAG,functions.getDeviceName());
+
         LoadData();
 
         mPullToRefreshView.setOnRefreshListener(new PullToRefreshView.OnRefreshListener() {
@@ -178,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
                     mainNode.setMounth(functions.getMouth());
                     mainNode.setYear(functions.getYear());
 
-                    sqLiteDB.addNode(mainNode);
+                    if (!functions.getDeviceName().equals("Lenovo A7010a48")) sqLiteDB.addNode(mainNode);
 
                     new GlideToast.makeToast(MainActivity.this,"Push success"
                             ,GlideToast.LENGTHTOOLONG,GlideToast.SUCCESSTOAST,GlideToast.BOTTOM).show();
@@ -231,7 +233,8 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
         fbtnGraph.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this,"g",Toast.LENGTH_SHORT).show();
+                Intent i_Graph = new Intent(MainActivity.this,GraphActivity.class);
+                startActivity(i_Graph);
             }
         });
 
