@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardBackgroundColor="@color/fbutton_color_midnight_blue"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:id="@+id/cv">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txtvDay"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:paddingVertical="20dp"
+                android:paddingHorizontal="10dp"
+                android:textStyle="bold"
+                android:textSize="30dp"
+                android:background="@drawable/bodertextview"
+                android:textColor="@color/colorWhite"
+                android:gravity="center"
+                android:text="22"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/txtvDayTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:layout_marginTop="5dp"
+                    android:paddingHorizontal="10dp"
+                    android:textColor="@color/colorWhite"
+                    android:text="Chủ Nhật, 22 tháng 7 2018"
+                    android:paddingVertical="5dp"/>
+                <TextView
+                    android:id="@+id/txtvTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:paddingHorizontal="10dp"
+                    android:textColor="@color/colorWhite"
+                    android:text="09:16:06 CH, Giờ Đông Dương"/>
+
+                <View
+                    android:layout_marginTop="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@color/fbutton_color_pomegranate" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="10dp"
+                    android:orientation="horizontal"
+                    android:gravity="end">
+                    <com.sackcentury.shinebuttonlib.ShineButton
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_centerInParent="true"
+                        android:src="@android:color/darker_gray"
+                        android:id="@+id/heart"
+                        app:btn_color="@android:color/darker_gray"
+                        app:btn_fill_color="@color/color_4"
+                        app:allow_random_color="true"
+                        app:siShape="@raw/heart"
+                        android:layout_marginRight="40dp"/>
+
+                    <com.sackcentury.shinebuttonlib.ShineButton
+                        android:layout_marginHorizontal="10dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_centerInParent="true"
+                        android:src="@android:color/darker_gray"
+                        android:id="@+id/po_image2"
+                        app:btn_color="@android:color/darker_gray"
+                        app:allow_random_color="true"
+                        app:btn_fill_color="@color/color_12"
+                        app:siShape="@raw/like"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

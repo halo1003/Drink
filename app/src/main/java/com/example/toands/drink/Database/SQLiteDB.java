@@ -10,6 +10,9 @@ import android.util.Log;
 import com.example.toands.drink.Model.MainNode;
 import com.example.toands.drink.Model.Version;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SQLiteDB extends SQLiteOpenHelper{
 
     static String DBname = "Schedule";
@@ -87,6 +90,19 @@ public class SQLiteDB extends SQLiteOpenHelper{
         return c;
     }
 
+    public long getNodesCountCondition(String TBname,int month, int year) {
+        String countQuery = "SELECT  COUNT(*) FROM " + TBname +" WHERE "
+                + colMonth +" = " + month
+                + " AND "
+                + colYear + " = " + year;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(countQuery, null);
+        cursor.moveToFirst();
+        long c  = cursor.getInt(0);
+        cursor.close();
+        return c;
+    }
+
     public void addNode(MainNode mainNode){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -126,6 +142,56 @@ public class SQLiteDB extends SQLiteOpenHelper{
         cursor.close();
         db.close();
         return null;
+    }
+
+    public List<Integer> getNodeMonth(){
+        List<Integer> li = new ArrayList<Integer>();
+        String sql = "SELECT * FROM "+ TBname;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(sql, null);
+        while (cursor.moveToNext()){
+            do {
+                MainNode mainNode = new MainNode();
+                mainNode.setId(cursor.getInt(0));
+                mainNode.setHour(cursor.getString(1));
+                mainNode.setMinute(cursor.getString(2));
+                mainNode.setSecond(cursor.getString(3));
+                mainNode.setTime_type(cursor.getString(4));
+                mainNode.setDay(cursor.getString(5));
+                mainNode.setMounth(cursor.getString(6));
+                mainNode.setYear(cursor.getString(7));
+                li.add(Integer.valueOf(mainNode.getMounth()));
+
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return li;
+    }
+
+    public List<Integer> getNodeYear(){
+        List<Integer> li = new ArrayList<Integer>();
+        String sql = "SELECT * FROM "+ TBname;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(sql, null);
+        while (cursor.moveToNext()){
+            do {
+                MainNode mainNode = new MainNode();
+                mainNode.setId(cursor.getInt(0));
+                mainNode.setHour(cursor.getString(1));
+                mainNode.setMinute(cursor.getString(2));
+                mainNode.setSecond(cursor.getString(3));
+                mainNode.setTime_type(cursor.getString(4));
+                mainNode.setDay(cursor.getString(5));
+                mainNode.setMounth(cursor.getString(6));
+                mainNode.setYear(cursor.getString(7));
+                li.add(Integer.valueOf(mainNode.getYear()));
+
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return li;
     }
 
     public void UpdateTB(String TBname,String hour,String minute,String second,String type){

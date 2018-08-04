@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".CircleActivity">
+
+    <com.dzaitsev.android.widget.RadarChartView
+        android:id="@+id/radar_chart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#fff"
+        android:padding="30dp"
+        app:axisColor="#22737b"
+        app:axisMax="240"
+        app:axisTick="60"
+        app:axisWidth="1dp"
+        app:chartColor="#C8FF4081"
+        app:chartStyle="stroke"
+        app:chartWidth="3dp"
+        app:circlesOnly="false"
+        app:endColor="#c3e3e5"
+        app:startColor="#5f9ca1"
+        app:textSize="12sp" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingHorizontal="25dp"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="--Radius Graph"
+                android:paddingBottom="10dp"/>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/cv">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:id="@+id/person_photo"
+                        android:background="@drawable/icwarning"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginRight="16dp"
+                        />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/Title"
+                            android:layout_toRightOf="@+id/person_photo"
+                            android:layout_alignParentTop="true"
+                            android:textSize="20sp"
+                            android:text="hello"
+                            />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/Content"
+                            android:layout_toRightOf="@+id/person_photo"
+                            android:layout_below="@+id/person_name"
+                            android:text="hellow"
+                            />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="COI CHỪNG TUI"
+                android:gravity="center_horizontal"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Central point [8h]\nEach blue circle +30 minute"
+                android:textStyle="italic"
+                android:textSize="10sp"
+                android:gravity="center_horizontal"/>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

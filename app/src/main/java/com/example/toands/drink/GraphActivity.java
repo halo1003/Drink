@@ -1,6 +1,7 @@
 package com.example.toands.drink;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Typeface;
@@ -11,7 +12,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -36,7 +40,12 @@ import com.github.mikephil.charting.listener.OnChartGestureListener;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.Utils;
 
+import org.angmarch.views.NiceSpinner;
+
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import static com.example.toands.drink.Database.SQLiteDB.TBname;
@@ -51,6 +60,7 @@ public class GraphActivity extends Activity implements OnSeekBarChangeListener,
     private static final String TAG = "GraphActivity";
 
     SQLiteDB sqLiteDB;
+    NiceSpinner niceSpinnerMonth, niceSpinnerYear;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +81,11 @@ public class GraphActivity extends Activity implements OnSeekBarChangeListener,
 //        mSeekBarY.setOnSeekBarChangeListener(this);
 //        mSeekBarX.setOnSeekBarChangeListener(this);
 
+        niceSpinnerMonth = (NiceSpinner) findViewById(R.id.nice_spinner_month);
+        niceSpinnerYear = (NiceSpinner) findViewById(R.id.nice_spinner_year);
+
         mChart = findViewById(R.id.chart1);
+
         mChart.setOnChartGestureListener(this);
         mChart.setOnChartValueSelectedListener(this);
         mChart.setDrawGridBackground(false);
@@ -144,31 +158,78 @@ public class GraphActivity extends Activity implements OnSeekBarChangeListener,
         leftAxis.setDrawLimitLinesBehindData(true);
 
         mChart.getAxisRight().setEnabled(false);
-
         //mChart.getViewPortHandler().setMaximumScaleY(2f);
         //mChart.getViewPortHandler().setMaximumScaleX(2f);
 
         //TODO: add data
         sqLiteDB = new SQLiteDB(getApplicationContext());
-        int count = (int) sqLiteDB.getNodesCount(TBname);
 
-        setData(count, 100);
+        final List<Integer> datasetMonth = new LinkedList<>(removeDuplicate(sqLiteDB.getNodeMonth()));
+        final List<Integer> datasetYear = new LinkedList<>(removeDuplicate(sqLiteDB.getNodeYear()));
 
-//        mChart.setVisibleXRange(20);
-//        mChart.setVisibleYRange(20f, AxisDependency.LEFT);
-//        mChart.centerViewTo(20, 50, AxisDependency.LEFT);
+        Log.e("TAGm", String.valueOf(datasetMonth));
+        Log.e("TAGy", String.valueOf(datasetYear));
+        niceSpinnerMonth.attachDataSource(datasetMonth);
+        niceSpinnerYear.attachDataSource(datasetYear);
 
-        mChart.animateX(2500);
-        //mChart.invalidate();
+        final int[] month = {0};
+        final int[] year = {0};
 
-        // get the legend (only possible after setting data)
-        Legend l = mChart.getLegend();
+        niceSpinnerMonth.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (year[0] == 0) {
+                    Toast.makeText(GraphActivity.this,"Input year please!",Toast.LENGTH_SHORT);
+                    month[0] = datasetMonth.get(position);
+                }
+                else {
+                    int count = (int) sqLiteDB.getNodesCountCondition(TBname, datasetMonth.get(position),year[0]);
+                    setData(count, 100);
+                    mChart.animateX(2500);
+                    Legend l = mChart.getLegend();
+                    l.setForm(LegendForm.LINE);
+                }
+            }
 
-        // modify the legend ...
-        l.setForm(LegendForm.LINE);
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
 
-        // // dont forget to refresh the drawing
-        // mChart.invalidate();
+            }
+        });
+
+        niceSpinnerYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (month[0] == 0){
+                    Toast.makeText(GraphActivity.this,"Input month please!",Toast.LENGTH_SHORT);
+                    year[0] = datasetYear.get(position);
+                }else {
+                    int count = (int) sqLiteDB.getNodesCountCondition(TBname, month[0],datasetYear.get(position));
+                    setData(count, 100);
+                    mChart.animateX(2500);
+                    Legend l = mChart.getLegend();
+                    l.setForm(LegendForm.LINE);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+    }
+
+    public List<Integer> removeDuplicate(List<Integer> arrayList){
+
+        Object[] st = arrayList.toArray();
+        for (Object s : st) {
+            if (arrayList.indexOf(s) != arrayList.lastIndexOf(s)) {
+                arrayList.remove(arrayList.lastIndexOf(s));
+            }
+        }
+
+        return arrayList;
     }
 
     @Override

@@ -17,7 +17,8 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1.1">
+            android:layout_weight="1.1"
+            android:background="@color/fbutton_color_wet_asphalt">
 
             <com.yalantis.phoenix.PullToRefreshView
                 android:id="@+id/pull_to_refresh"
@@ -33,6 +34,18 @@
                     android:paddingLeft="12dp"
                     android:paddingRight="12dp"
                     android:paddingTop="12dp"/>
+
+                <xyz.sangcomz.stickytimelineview.TimeLineRecyclerView
+                    android:id="@+id/recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    fancy:timeLineWidth="1dp"
+                    fancy:timeLineColor="@color/fbutton_color_pomegranate"
+                    fancy:sectionTitleTextColor="@color/colorWhite"
+                    fancy:timeLineCircleColor="@color/color_26"
+                    fancy:sectionTitleTextSize="15dp"
+                    fancy:sectionBackgroundColor="@color/fbutton_color_wet_asphalt"
+                    fancy:isSticky="true"/>
 
             </com.yalantis.phoenix.PullToRefreshView>
 
@@ -88,17 +101,6 @@
             android:gravity="top"
             android:layout_weight="5.9">
 
-
-            <!--<Button-->
-            <!--android:id="@+id/btnMain"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:padding="10dp"-->
-            <!--android:layout_marginTop="12dp"-->
-            <!--android:text="Push"-->
-            <!--android:layout_marginHorizontal="50dp"-->
-            <!--android:background="@drawable/shape_button"-->
-            <!--android:drawableStart="@android:drawable/ic_popup_reminder" />-->
             <mehdi.sakout.fancybuttons.FancyButton
                 android:id="@+id/btnMain"
                 android:layout_width="match_parent"
@@ -134,15 +136,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="bottom"
-        android:orientation="vertical"
-        android:weightSum="30">
+        android:orientation="vertical">
 
         <com.qhutch.bottomsheetlayout.BottomSheetLayout
             android:id="@+id/bottom_sheet_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:collapsedHeight="20dp"
-            android:layout_weight="1">
+            android:layout_height="match_parent"
+            app:collapsedHeight="20dp">
 
             <LinearLayout
                 android:background="@color/fbutton_color_midnight_blue"
@@ -197,7 +197,45 @@
                         fancy:fb_focusColor="#ffc800"
                         fancy:fb_iconPosition="left"
                         fancy:fb_radius="30dp"
-                        fancy:fb_text="Graph"
+                        fancy:fb_text="Line Graph"
+                        fancy:fb_textColor="#FFFFFF" />
+
+                    <mehdi.sakout.fancybuttons.FancyButton
+                        android:id="@+id/btnSwitch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginHorizontal="50dp"
+                        android:paddingBottom="10dp"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="20dp"
+                        android:paddingTop="10dp"
+                        fancy:fb_borderColor="#FFFFFF"
+                        fancy:fb_borderWidth="1dp"
+                        fancy:fb_defaultColor="@color/fbutton_color_orange"
+                        fancy:fb_focusColor="#ffc800"
+                        fancy:fb_iconPosition="left"
+                        fancy:fb_radius="30dp"
+                        fancy:fb_text="Radius Graph"
+                        fancy:fb_textColor="#FFFFFF" />
+
+                    <mehdi.sakout.fancybuttons.FancyButton
+                        android:id="@+id/btnUI"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginHorizontal="50dp"
+                        android:paddingBottom="10dp"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="20dp"
+                        android:paddingTop="10dp"
+                        fancy:fb_borderColor="#FFFFFF"
+                        fancy:fb_borderWidth="1dp"
+                        fancy:fb_defaultColor="@color/fbutton_default_color"
+                        fancy:fb_focusColor="#00d9ff"
+                        fancy:fb_iconPosition="left"
+                        fancy:fb_radius="30dp"
+                        fancy:fb_text="UI Layout"
                         fancy:fb_textColor="#FFFFFF" />
 
                     <mehdi.sakout.fancybuttons.FancyButton

@@ -1,0 +1,4 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle" >
+    <solid android:color="@color/fbutton_color_alizarin" />
+    <stroke android:width="1dip" android:color="#565656"/>
+</shape>

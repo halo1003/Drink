@@ -4,44 +4,38 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Environment;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
-import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
-import android.view.animation.RotateAnimation;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.toands.drink.Adapter.AppStackAdapter;
+import com.example.toands.drink.Adapter.TimelineAdapter;
 import com.example.toands.drink.Database.SQLiteDB;
 import com.example.toands.drink.Model.MainNode;
+import com.example.toands.drink.Model.Message;
+import com.example.toands.drink.Model.Timeline;
 import com.example.toands.drink.Model.Version;
 import com.example.toands.drink.Service.AutoPush;
 
 import com.github.javiersantos.materialstyleddialogs.MaterialStyledDialog;
 import com.github.javiersantos.materialstyleddialogs.enums.Style;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FileDownloadTask;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.jeevandeshmukh.glidetoastlib.GlideToast;
 import com.loopeer.cardstack.AllMoveDownAnimatorAdapter;
 import com.loopeer.cardstack.CardStackView;
@@ -51,11 +45,15 @@ import com.pedro.library.AutoPermissions;
 import com.qhutch.bottomsheetlayout.BottomSheetLayout;
 import com.yalantis.phoenix.PullToRefreshView;
 
-import java.io.File;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import mehdi.sakout.fancybuttons.FancyButton;
+import xyz.sangcomz.stickytimelineview.RecyclerSectionItemDecoration;
+import xyz.sangcomz.stickytimelineview.TimeLineRecyclerView;
+import xyz.sangcomz.stickytimelineview.model.SectionInfo;
 
 import static com.example.toands.drink.Database.SQLiteDB.TB_version_name;
 import static com.example.toands.drink.Database.SQLiteDB.TBname;
@@ -67,10 +65,11 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
     ContainValue containValue = new ContainValue();
     Functions functions = new Functions();
 
-    FancyButton fancyButton,fbtnGraph,fbtnDownload;
+    FancyButton fancyButton,fbtnGraph,fbtnDownload,fbtnSwitch, fbtnUI;
     PullToRefreshView mPullToRefreshView;
 
     private CardStackView mStackView;
+    private TimeLineRecyclerView recyclerView;
     private RelativeLayout mActionButtonContainer;
     private AppStackAdapter mStackAdapter;
     private RelativeLayout relativeLayout;
@@ -78,11 +77,11 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
     private ImageView imageView;
 
     private int control = -1;
-
-    private String tagMain = "btnMain";
-    private String pluse = "+";
+    private int ui;
+    SharedPreferences sharedPreferences;
 
     List<Integer> list_date = new ArrayList<Integer>();
+    List<Timeline> listTimeline = new ArrayList<Timeline>();
 
     public static Integer[] Initial = new Integer[]{};
 
@@ -115,6 +114,9 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
             R.color.color_26
     };
 
+    List<Integer> integersList = new ArrayList<Integer>();
+    CharSequence layout[] = new CharSequence[] {"Card View", "Timeline View"};
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -122,6 +124,8 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
 
         Window window = MainActivity.this.getWindow();
         window.setStatusBarColor(ContextCompat.getColor(MainActivity.this,R.color.fbutton_color_midnight_blue));
+        sharedPreferences = getSharedPreferences("UI", Context.MODE_PRIVATE);
+        final SharedPreferences.Editor editor = sharedPreferences.edit();
 
         Intent i_auto = new Intent(MainActivity.this,AutoPush.class);
         startService(i_auto);
@@ -130,19 +134,15 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
 
         AutoPermissions.Companion.loadAllPermissions(MainActivity.this, 1);
 
+        String machine = functions.getDeviceName();
+
+        containValue._drink3e7a9.child("Device").setValue(machine);
+
         relativeLayout.setVisibility(View.GONE);
         final SQLiteDB sqLiteDB = new SQLiteDB(getApplicationContext());
 
         sqLiteDB.Create_table();
         sqLiteDB.Create_table_ver();
-
-        mStackView.setItemExpendListener(MainActivity.this);
-        mStackAdapter = new AppStackAdapter(getApplicationContext());
-        mStackView.setAdapter(mStackAdapter);
-
-        Log.e(TAG,functions.getDeviceName());
-
-        LoadData();
 
         mPullToRefreshView.setOnRefreshListener(new PullToRefreshView.OnRefreshListener() {
             @Override
@@ -159,15 +159,42 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
             }
         });
 
+        returnUI();
+
+        fbtnUI.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ui = sharedPreferences.getInt("layout", 1);
+                new MaterialDialog.Builder(MainActivity.this)
+                        .title("Pick a theme")
+                        .items(layout)
+                        .itemsCallbackSingleChoice(ui, new MaterialDialog.ListCallbackSingleChoice() {
+                            @Override
+                            public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                                editor.putInt("layout",which);
+                                editor.apply();
+                                returnUI();
+                                return true;
+                            }
+                        })
+                        .positiveText("Choose")
+                        .negativeText("Cancel")
+                        .show();
+
+            }
+        });
+
+        fbtnSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i_cir = new Intent(MainActivity.this,CircleActivity.class);
+                startActivity(i_cir);
+            }
+        });
+
         fancyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                final Intent i = new Intent(MainActivity.this, FirebaseService.class);
-//                startService(i);
-//
-//                Intent i_constantService = new Intent(MainActivity.this, ConstantService.class);
-//                startService(i_constantService);
-
                 if (sqLiteDB.getNodesCount(TBname)==0 || (Integer.parseInt(sqLiteDB.getNew(TBname).getDay())!=Integer.parseInt(functions.getDay()))){
 
                     MainNode mainNode = new MainNode();
@@ -244,7 +271,6 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
                 control = control * -1;
                 imageView.animate().rotationBy(180*control).setDuration(500).setInterpolator(new LinearInterpolator()).start();
                 bottomSheetLayout.toggle();
-                //imageView.setEnabled(false);
             }
         });
 
@@ -258,6 +284,85 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
                 }
             }
         });
+    }
+
+    private void returnUI(){
+        ui = sharedPreferences.getInt("layout", 1);
+        switch (ui){
+            case 0:
+                CardUI();
+                break;
+            case 1:
+                TimelineUI();
+                break;
+            case 2:
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void TimelineUI(){
+        Log.e(TAG,"TimelineUI");
+
+        containValue._Messages.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                listTimeline = new ArrayList<Timeline>();
+                for (DataSnapshot singleMess: dataSnapshot.getChildren()){
+                    Message message = singleMess.getValue(Message.class);
+                    String time[] = message.getSortDay().split(",");
+
+                    listTimeline.add(new Timeline(time[0],time[1],message.getTime(),message.getDate()));
+
+                }
+
+                integersList = functions.detectSectionEnd(listTimeline);
+                TimelineAdapter timelineAdapter = new TimelineAdapter(listTimeline);
+
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL,false);
+                recyclerView.addItemDecoration(getSectionCallback(listTimeline));
+
+                recyclerView.setLayoutManager(linearLayoutManager);
+                recyclerView.setAdapter(timelineAdapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private RecyclerSectionItemDecoration.SectionCallback getSectionCallback(final List<Timeline> Timeline){
+        return new RecyclerSectionItemDecoration.SectionCallback() {
+            @Override
+            public boolean isSection(int i) {
+                for (Integer j : integersList){
+                    if (j == i) return true;
+                }
+                return false;
+            }
+
+            @Nullable
+            @Override
+            public SectionInfo getSectionHeader(int i) {
+                String s[] = Timeline.get(i).month.split(" ");
+                String month = functions.standaraze(s[1])+" "+s[2];
+                return new SectionInfo(month,s[3]);
+            }
+        };
+    }
+
+    private void CardUI(){
+        Log.e(TAG,"CardUI");
+        mStackView.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.INVISIBLE);
+
+        mStackView.setItemExpendListener(MainActivity.this);
+        mStackAdapter = new AppStackAdapter(getApplicationContext());
+        mStackView.setAdapter(mStackAdapter);
+        LoadData();
     }
 
     private void Download(String link){
@@ -325,7 +430,13 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
                 int n = (int) dataSnapshot.getChildrenCount();
 
                 for (int i = 0 ; i < n ; i++){
-                    list_date.add(TEST_DATAS[i]);
+                    int j = i;
+                    if (i>=TEST_DATAS.length) {
+                        int temp = i/TEST_DATAS.length;
+                        j = i - (TEST_DATAS.length*temp);
+                    }
+
+                    list_date.add(TEST_DATAS[j]);
                 }
 
                 functions.loge("MainActivity","fresh: success");
@@ -340,16 +451,20 @@ public class MainActivity extends AppCompatActivity implements CardStackView.Ite
         });
     }
 
+    //TODO: _DefaultCaller
     public void _DefaultCaller() {
 
         fancyButton = (FancyButton) findViewById(R.id.btnMain);
         fbtnGraph = (FancyButton)findViewById(R.id.btnGraph);
         fbtnDownload = (FancyButton) findViewById(R.id.btnDownload);
+        fbtnSwitch = (FancyButton) findViewById(R.id.btnSwitch);
+        fbtnUI = (FancyButton) findViewById(R.id.btnUI);
 
         mActionButtonContainer = (RelativeLayout) findViewById(R.id.button_container);
 
         relativeLayout = (RelativeLayout) findViewById(R.id.button_container);
         mStackView = (CardStackView) findViewById(R.id.stackview_main);
+        recyclerView = (TimeLineRecyclerView)findViewById(R.id.recycler_view);
         mPullToRefreshView = (PullToRefreshView) findViewById(R.id.pull_to_refresh);
         bottomSheetLayout = (BottomSheetLayout) findViewById(R.id.bottom_sheet_layout);
 

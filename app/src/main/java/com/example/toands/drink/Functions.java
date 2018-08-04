@@ -3,9 +3,14 @@ package com.example.toands.drink;
 import android.os.Build;
 import android.util.Log;
 
+import com.example.toands.drink.Model.Timeline;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
 
 public class Functions {
 
@@ -61,8 +66,25 @@ public class Functions {
         }
     }
 
+    public String chuanHoa(String str) {
+        str = str.trim();
+        str = str.replaceAll("\\s+", " ");
+        return str;
+    }
 
-    private String capitalize(String s) {
+    public String standaraze(String str) {
+        str = chuanHoa(str);
+        String temp[] = str.split(" ");
+        str = ""; // ? ^-^
+        for (int i = 0; i < temp.length; i++) {
+            str += String.valueOf(temp[i].charAt(0)).toUpperCase() + temp[i].substring(1);
+            if (i < temp.length - 1) // ? ^-^
+                str += " ";
+        }
+        return str;
+    }
+
+    public String capitalize(String s) {
         if (s == null || s.length() == 0) {
             return "";
         }
@@ -102,6 +124,35 @@ public class Functions {
         DateFormat df = new SimpleDateFormat("EEEE, dd MMMM yyyy");
         String date = df.format(Calendar.getInstance().getTime());
         return date;
+    }
+
+    public List<Integer> detectSectionEnd(List<Timeline> list){
+        List<Integer> integerList1 = new ArrayList<Integer>();
+        List<Integer> integerList2 = new ArrayList<Integer>();
+
+        for(Timeline li : list){
+            String s[] = li.month.split(" ");
+            integerList1.add(Integer.valueOf(s[2]));
+        }
+
+        int i = 0;
+        while (integerList1.size()>i){
+            int temp  = recursive(integerList1,i);
+            i = i+temp;
+            integerList2.add(i);
+        }
+        return integerList2;
+    }
+
+    public int recursive(List<Integer> integerList,int i){
+        int count = 0;
+        int start = integerList.get(i);
+
+        for (int j: integerList){
+            if (j == start) count++;
+        }
+
+        return count;
     }
 
     public void loge(String x1,String x2){
